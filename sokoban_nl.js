@@ -56,7 +56,7 @@ const gameObjects = {
 ////////////////////////////////////////
 
 function startGame(){
-    $.getJSON("maps.json", function(data){
+    $.getJSON("maps.json", function(data) {
         mapsObject = data;
         myGameCanvas.start(mapsObject,currentLevel);
     });
@@ -88,31 +88,31 @@ myGameCanvas = {
         //matrix: y (vertical - column) => x (horizontal - row)
         //canvas: x (horizontal) => y (vertical)
         for(var i=0; i<map.length; i++){
-            for(var j=0; j<map[0].length; j++){
-                if (map[i][j]=== gameObjects.player.sign){
+            for(var j=0; j<map[0].length; j++) {
+                if (map[i][j]=== gameObjects.player.sign) {
                     sokoban = new component(gameObjects.player.source,j*CELL_SIZE,i*CELL_SIZE);
                     console.log(sokoban.x);
                     console.log(sokoban.y);
                 }
-                else if (map[i][j]=== gameObjects.grass.sign){
+                else if (map[i][j]=== gameObjects.grass.sign) {
                     var grass= new component(gameObjects.grass.source,j*CELL_SIZE,i*CELL_SIZE);
                 }
-                else if (map[i][j]=== gameObjects.block.sign){
+                else if (map[i][j]=== gameObjects.block.sign) {
                     var block = new component(gameObjects.block.source,j*CELL_SIZE,i*CELL_SIZE);
                 }
-                else if (map[i][j]=== gameObjects.box.sign || map[i][j]=== gameObjects["box on spot"].sign){
-                    if(map[i][j] === gameObjects.box.sign){
+                else if (map[i][j]=== gameObjects.box.sign || map[i][j]=== gameObjects["box on spot"].sign) {
+                    if(map[i][j] === gameObjects.box.sign) {
                         var box= new component(gameObjects.box.source,j*CELL_SIZE,i*CELL_SIZE);
                     }
-                    else{
+                    else {
                         box = new component(gameObjects["box on spot"].source,j*CELL_SIZE,i*CELL_SIZE);
                         goalCounter++;
                         target++;
                     }
 
                 }
-                else if (map[i][j]=== gameObjects.spot.sign || map[i][j]=== gameObjects["player on spot"].sign){
-                    if(map[i][j] === gameObjects.spot.sign){
+                else if (map[i][j]=== gameObjects.spot.sign || map[i][j]=== gameObjects["player on spot"].sign) {
+                    if(map[i][j] === gameObjects.spot.sign) {
                         var spot = new component(gameObjects.spot.source,j*CELL_SIZE,i*CELL_SIZE);
                     }
                     else {
@@ -123,7 +123,7 @@ myGameCanvas = {
                     target++;
 
                 }
-                else if(map[i][j]=== gameObjects.floor.sign){
+                else if(map[i][j]=== gameObjects.floor.sign) {
                     var floor = new component(gameObjects.floor.source,j*CELL_SIZE,i*CELL_SIZE);
                 }
 
