@@ -5,9 +5,9 @@ window.onload = startGame;
 //Variables declaration/////////////////
 ////////////////////////////////////////
 
-var sokoban;            //the player component - stores the current coordination (on canvas) of the player to be used to direct move after handle key stroke
+var sokoban;            //the player component - stores the current coordinates (on canvas) of the player to be used to direct move after handle key stroke
 var myGameCanvas;       //canvas to create & display game
-var currentMap = [];    //matrix initially loaded from json, stores map after each move
+var currentMap = [];    //matrix initially loaded from json, updated map after each move
 var moves = 0;          //number of moves made
 var currentLevel = 0;   //current level of the game loaded
 var target = 0;         //number of target spots to filled
@@ -163,62 +163,72 @@ function move(keyCode, object) {
     console.log("currentpos ="+ posX +"" + posY);
     console.log("newpos ="+ nextPosX +"" + nextPosY +","+newPos);
 
+    //update the previous position of player after making the move
     function updatePreviousPos() {
         if (currentPos === gameObjects["player on spot"].sign) {
-            console.log("Old spot curentpos: " + currentPos);
-            currentMap[posX][posY] = gameObjects.spot.sign;
+            console.log("Old spot: " + currentPos);
+            currentMap[posX][posY] = gameObjects.spot.sign; //player on spot => spot
         }
         else {
-            currentMap[posX][posY] = gameObjects.floor.sign;
+            currentMap[posX][posY] = gameObjects.floor.sign; //player on blank space => blank space
         }
         console.log("updated pos: " + currentMap[posX][posY]);
     }
 
-        //next move is a blank space
-        if (newPos === gameObjects.floor.sign) {
-            //update new position
-            currentMap[nextPosX][nextPosY] = gameObjects.player.sign;
-            updatePreviousPos();
-            moves++;
-            updateGameCanvas();
-            console.log(currentMap[nextPosX][nextPosY]);
-        }
-
-        //next move is a target spot
-        else if (newPos === gameObjects.spot.sign) {
-            //update new position
-            currentMap[nextPosX][nextPosY] = gameObjects["player on spot"].sign;
-            updatePreviousPos();
-            moves++;
-            updateGameCanvas();
-        }
-
-        // next move is a box or box on spot => push
-        else if (newPos === gameObjects.box.sign || newPos === gameObjects["box on spot"].sign) {
-            //next move of box/box-on-spot is a goal spot
-            if (currentMap[nextPosX + dx][nextPosY + dy] === gameObjects.spot.sign) {
-                //update player's next position and box's next position
-                currentMap[nextPosX][nextPosY] = gameObjects.player.sign;
-                currentMap[nextPosX + dx][nextPosY + dy] = gameObjects["box on spot"].sign;
-                goalCounter++;
-                updatePreviousPos();
-                moves++;
-            }
-            //next move of box/box-on-spot is a blank space
-            else if (currentMap[nextPosX + dx][nextPosY + dy] === gameObjects.floor.sign) {
-                //update player's next position and box's next position
-                currentMap[nextPosX][nextPosY] = gameObjects.player.sign;
-                currentMap[nextPosX + dx][nextPosY + dy] = gameObjects.box.sign;
-                updatePreviousPos();
-                moves++;
-            }
-            updateGameCanvas();
-        }
-        console.log(currentMap);
+    //next move is a blank space
+    if (newPos === gameObjects.floor.sign) {
+        //update new position
+        currentMap[nextPosX][nextPosY] = gameObjects.player.sign;
+        updatePreviousPos();
+        moves++;
+        updateGameCanvas();
+        console.log(currentMap[nextPosX][nextPosY]);
     }
 
-//function to check for status after each move and reload game canvas
+    //next move is a target spot
+    else if (newPos === gameObjects.spot.sign) {
+        //update new position
+        currentMap[nextPosX][nextPosY] = gameObjects["player on spot"].sign;
+        updatePreviousPos();
+        moves++;
+        updateGameCanvas();
+    }
+
+    // next move is a box or box-on-spot => push
+    else if (newPos === gameObjects.box.sign || newPos === gameObjects["box on spot"].sign) {
+        //next move of box/box-on-spot is a goal spot
+        if (currentMap[nextPosX + dx][nextPosY + dy] === gameObjects.spot.sign) {
+            //update player's next position and box's next position
+            currentMap[nextPosX][nextPosY] = gameObjects.player.sign; //box/box-on-spot => player
+            currentMap[nextPosX + dx][nextPosY + dy] = gameObjects["box on spot"].sign; //spot => box on spot
+            goalCounter++;
+            updatePreviousPos();
+            moves++;
+        }
+        //next move of box/box-on-spot is a blank space
+        else if (currentMap[nextPosX + dx][nextPosY + dy] === gameObjects.floor.sign) {
+            //update player's next position and box's next position
+            currentMap[nextPosX][nextPosY] = gameObjects.player.sign; //box/box-on-spot => player
+            currentMap[nextPosX + dx][nextPosY + dy] = gameObjects.box.sign; //blank space => box
+            updatePreviousPos();
+            moves++;
+        }
+        updateGameCanvas();
+    }
+    console.log(currentMap);
+}
+
+//function to check for game status (up-level or not) after each move and reload game canvas
 function updateGameCanvas() {
+    myGameCanvas.clear();
+    myGameCanvas.displayMap(currentMap);
+    var moveDisplay = document.getElementById("moves");
+    moveDisplay.innerHTML = "Moves: "+ moves;
+    console.log(moves);
+    console.log(sokoban.x, sokoban.y);
+    var message = document.getElementById("message");
+    message.innerHTML = "";
+
     if (goalCounter === target) {
         var message = document.getElementById("message");
         if(currentLevel < mapsObject.mapLevels.length) {
@@ -232,15 +242,6 @@ function updateGameCanvas() {
         else {
             message.innerHTML = "Arg, you've won all of our puzzle. No more games smarty pants!";
         }
-
-    }
-    else {
-        var moveDisplay = document.getElementById("moves");
-        moveDisplay.innerHTML = "Moves: "+ moves;
-        console.log(moves);
-        myGameCanvas.clear();
-        myGameCanvas.displayMap(currentMap);
-        console.log(sokoban.x, sokoban.y);
     }
 
 }
