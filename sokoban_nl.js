@@ -117,6 +117,8 @@ myGameCanvas = {
                     }
                     else {
                         var playerOnSpot = new component(gameObjects.player.source,j*CELL_SIZE,i*CELL_SIZE);
+                        sokoban.x = j*CELL_SIZE;
+                        sokoban.y = i*CELL_SIZE;
                     }
                     target++;
 
@@ -175,7 +177,7 @@ function move(keyCode, object) {
         console.log("updated pos: " + currentMap[posX][posY]);
     }
 
-    //next move is a blank space
+    //next position is a blank space
     if (newPos === gameObjects.floor.sign) {
         //update new position
         currentMap[nextPosX][nextPosY] = gameObjects.player.sign;
@@ -185,7 +187,7 @@ function move(keyCode, object) {
         console.log(currentMap[nextPosX][nextPosY]);
     }
 
-    //next move is a target spot
+    //next position is a target spot
     else if (newPos === gameObjects.spot.sign) {
         //update new position
         currentMap[nextPosX][nextPosY] = gameObjects["player on spot"].sign;
@@ -194,20 +196,37 @@ function move(keyCode, object) {
         updateGameCanvas();
     }
 
-    // next move is a box or box-on-spot => push
-    else if (newPos === gameObjects.box.sign || newPos === gameObjects["box on spot"].sign) {
-        //next move of box/box-on-spot is a goal spot
+    //next position is a box
+    else if (newPos === gameObjects.box.sign) {
+        //next move of box is a goal spot
         if (currentMap[nextPosX + dx][nextPosY + dy] === gameObjects.spot.sign) {
-            //update player's next position and box's next position
-            currentMap[nextPosX][nextPosY] = gameObjects.player.sign; //box/box-on-spot => player
+            currentMap[nextPosX][nextPosY] = gameObjects.player.sign; //update box => player
             currentMap[nextPosX + dx][nextPosY + dy] = gameObjects["box on spot"].sign; //spot => box on spot
             updatePreviousPos();
             moves++;
         }
-        //next move of box/box-on-spot is a blank space
+        //next move of box is a blank space
         else if (currentMap[nextPosX + dx][nextPosY + dy] === gameObjects.floor.sign) {
-            //update player's next position and box's next position
-            currentMap[nextPosX][nextPosY] = gameObjects.player.sign; //box/box-on-spot => player
+            currentMap[nextPosX][nextPosY] = gameObjects.player.sign; //update box => player
+            currentMap[nextPosX + dx][nextPosY + dy] = gameObjects.box.sign; //blank space => box
+            updatePreviousPos();
+            moves++;
+        }
+        updateGameCanvas();
+    }
+
+    //next position is a box-on-spot
+    else if (newPos === gameObjects["box on spot"].sign) {
+        //next move of box-on-spot is a goal spot
+        if (currentMap[nextPosX + dx][nextPosY + dy] === gameObjects.spot.sign) {
+            currentMap[nextPosX][nextPosY] = gameObjects["player on spot"].sign; //box-on-spot => player-on-spot
+            currentMap[nextPosX + dx][nextPosY + dy] = gameObjects["box on spot"].sign; //spot => box on spot
+            updatePreviousPos();
+            moves++;
+        }
+        //next move of box is a blank space
+        else if (currentMap[nextPosX + dx][nextPosY + dy] === gameObjects.floor.sign) {
+            currentMap[nextPosX][nextPosY] = gameObjects["player on spot"].sign; //box-on-spot => player-on-spot
             currentMap[nextPosX + dx][nextPosY + dy] = gameObjects.box.sign; //blank space => box
             updatePreviousPos();
             moves++;
@@ -222,12 +241,14 @@ function updateGameCanvas() {
     myGameCanvas.displayMap(currentMap);
     var moveDisplay = document.getElementById("moves");
     moveDisplay.innerHTML = "Moves: "+ moves;
+    console.log(moves);
+    console.log(sokoban.x, sokoban.y);
     var message = document.getElementById("message");
     message.innerHTML = "";
 
     if (goalCounter === target) {
         var message = document.getElementById("message");
-        if(currentLevel < mapsObject.mapLevels.length) {
+        if(currentLevel < (mapsObject.mapLevels.length-1)) {
             message.innerHTML = "Great job! Now up to the next level.";
             //display message you win => move to next level
             currentLevel++;
