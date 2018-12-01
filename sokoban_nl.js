@@ -201,7 +201,6 @@ function move(keyCode, object) {
             //update player's next position and box's next position
             currentMap[nextPosX][nextPosY] = gameObjects.player.sign; //box/box-on-spot => player
             currentMap[nextPosX + dx][nextPosY + dy] = gameObjects["box on spot"].sign; //spot => box on spot
-            goalCounter++;
             updatePreviousPos();
             moves++;
         }
@@ -215,7 +214,6 @@ function move(keyCode, object) {
         }
         updateGameCanvas();
     }
-    console.log(currentMap);
 }
 
 //function to check for game status (up-level or not) after each move and reload game canvas
@@ -224,8 +222,6 @@ function updateGameCanvas() {
     myGameCanvas.displayMap(currentMap);
     var moveDisplay = document.getElementById("moves");
     moveDisplay.innerHTML = "Moves: "+ moves;
-    console.log(moves);
-    console.log(sokoban.x, sokoban.y);
     var message = document.getElementById("message");
     message.innerHTML = "";
 
