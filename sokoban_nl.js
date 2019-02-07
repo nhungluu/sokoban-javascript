@@ -10,10 +10,12 @@
     var myGameCanvas;       //canvas to create & display game
     var currentMap = [];    //matrix initially loaded from json, updated map after each move
     var moves = 0;          //number of moves made
+    var moveDisplay;        //display number of move made on html
     var currentLevel = 0;   //current level of the game loaded
+    var levelDisplay;       //display current level on html
     var target = 0;         //number of target spots to filled
     var goalCounter = 0;    //number of target goals achieved
-    var CELL_SIZE = 40;     //size of each matrix cell to display on canvas
+    var CELL_SIZE = 70;     //size of each matrix cell to display on canvas
     var mapsObject = {};    //game maps loaded from json
     //stores the source of image file and character used on game map matrix
     const gameObjects = {
@@ -56,6 +58,7 @@
     ////////////////////////////////////////
 
     function startGame(){
+
         $.getJSON("maps.json", function(data) {
             mapsObject = data;
             console.log(data);
@@ -64,16 +67,17 @@
         });
     }
 
-    //function to load game canvas of current level from map stored in json
+    //Function to load game canvas of current level from map stored in json
     function Game(maps){
 
         this.maps = maps;
         this.currentLevel = 0;
 
-        this.canvas = document.createElement("canvas"),
-        this.context = this.canvas.getContext("2d");        
 
-        //load map at the current level from existing map library stored in json
+        this.canvas = document.createElement("canvas"),
+            this.context = this.canvas.getContext("2d");
+
+        //Load map at the current level from existing map library stored in json
         this.start = function(level) {
             this.currentLevel = level;
             currentMap = this.maps.mapLevels[level].map;
@@ -81,6 +85,10 @@
             this.canvas.width = currentMap[0].length*CELL_SIZE;
             var gameCanvas = document.getElementById("sokoban_holder");
             gameCanvas.appendChild(this.canvas);
+            moveDisplay = document.getElementById("moves");
+            moveDisplay.innerHTML = "Moves: "+ moves;
+            levelDisplay = document.getElementById("level");
+            levelDisplay.innerHTML = "Level: "+ (currentLevel + 1);
             setTimeout(()=>{
                 this.displayMap(currentMap);
             })
@@ -90,7 +98,7 @@
         this.clear = function() {
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         };
-        
+
         this.displayMap = function(map) {
             console.log('displaying',map);
             goalCounter = 0;
@@ -101,15 +109,15 @@
             for(var i=0; i<map.length; i++){
                 for(var j=0; j<map[0].length; j++) {
                     const cur = map[i][j];
-                    if (cur=== gameObjects.player.sign) {
+                    if (cur === gameObjects.player.sign) {
                         sokoban = new component(gameObjects.player.source,j*CELL_SIZE,i*CELL_SIZE);
                         console.log(sokoban.x);
                         console.log(sokoban.y);
                     }
-                    else if (cur=== gameObjects.grass.sign) {
+                    else if (cur === gameObjects.grass.sign) {
                         var grass = new component(gameObjects.grass.source,j*CELL_SIZE,i*CELL_SIZE);
                     }
-                    else if (cur=== gameObjects.block.sign) {
+                    else if (cur === gameObjects.block.sign) {
                         var block = new component(gameObjects.block.source,j*CELL_SIZE,i*CELL_SIZE);
                     }
                     else if (cur === gameObjects.box.sign || cur === gameObjects["box on spot"].sign) {
@@ -117,7 +125,7 @@
                             var box = new component(gameObjects.box.source,j*CELL_SIZE,i*CELL_SIZE);
                         }
                         else {
-                            box = new component(gameObjects["box on spot"].source,j*CELL_SIZE,i*CELL_SIZE);
+                            var box = new component(gameObjects["box on spot"].source,j*CELL_SIZE,i*CELL_SIZE);
                             goalCounter++;
                             target++;
                         }
@@ -125,12 +133,13 @@
                     }
                     else if (cur === gameObjects.spot.sign || cur === gameObjects["player on spot"].sign) {
                         if(cur === gameObjects.spot.sign) {
-                            var spot = new component(gameObjects.spot.source, j*CELL_SIZE,i*CELL_SIZE);
+                            var spot = new component(gameObjects.spot.source, j*CELL_SIZE, i*CELL_SIZE);
                         }
                         else {
-                            var playerOnSpot = new component(gameObjects.player.source, j*CELL_SIZE,i*CELL_SIZE);
-                            sokoban.x = j*CELL_SIZE;
-                            sokoban.y = i*CELL_SIZE;
+                            sokoban = new component(gameObjects.player.source, j*CELL_SIZE, i*CELL_SIZE);
+                            //sokoban.x = j*CELL_SIZE;
+                            //sokoban.y = i*CELL_SIZE;
+                            console.log("player on spot");
                         }
                         target++;
 
@@ -144,13 +153,13 @@
         }
     };
 
-    //function to create game object on canvas
+    //function to create game objects on canvas
     function component(img, x, y) {
         this.x = x;
         this.y = y;
         this.img = new Image();
         this.img.src = img;
-        this.img.onload = function(){
+        this.img.onload = function() {
             var ctx = myGameCanvas.context;
             ctx.drawImage(this.img, this.x, this.y, CELL_SIZE, CELL_SIZE);
         }.bind(this);
@@ -175,14 +184,14 @@
 
         var currentPos = currentMap[posX][posY];
         var newPos = currentMap[nextPosX][nextPosY];
-        console.log(currentMap);
-        console.log("currentpos ="+ posX +"" + posY);
-        console.log("newpos ="+ nextPosX +"" + nextPosY +","+newPos);
+        //console.log(currentMap);
+        //console.log("currentpos ="+ posX +"" + posY);
+        //console.log("newpos ="+ nextPosX +"" + nextPosY +","+newPos);
 
         //update the previous position of player after making the move
         function updatePreviousPos() {
             if (currentPos === gameObjects["player on spot"].sign) {
-                console.log("Old spot: " + currentPos);
+                //console.log("Old spot: " + currentPos);
                 currentMap[posX][posY] = gameObjects.spot.sign; //player on spot => spot
             }
             else {
@@ -253,10 +262,8 @@
     function updateGameCanvas() {
         // myGameCanvas.clear();
         myGameCanvas.displayMap(currentMap);
-        var moveDisplay = document.getElementById("moves");
         moveDisplay.innerHTML = "Moves: "+ moves;
         console.log(moves);
-        console.log(sokoban.x, sokoban.y);
         var message = document.getElementById("message");
         message.innerHTML = "";
 
