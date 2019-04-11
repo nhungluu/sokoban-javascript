@@ -1,6 +1,5 @@
 # sokoban-javascript
 Sokoban, a Japanese puzzle game created with Javascript. 
-This project in development.
 <p>
 <h2>Introduction</h2> <br/>
 Sokoban (Literally, ``Warehouse keeper'' in Japanese) is a single-player puzzle game originally devised by Hiroyuki Imabayashi and published by Thinking Rabbit in 1982. 
